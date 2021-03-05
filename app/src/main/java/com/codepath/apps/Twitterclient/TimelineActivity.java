@@ -40,9 +40,7 @@ public class TimelineActivity extends AppCompatActivity {
 
         swipeContainer = findViewById(R.id.swipeContainer);
 
-        swipeContainer.setColorSchemeColors(android.R.color.holo_blue_bright,
-                android.R.color.holo_orange_dark,
-                android.R.color.holo_purple
+        swipeContainer.setColorSchemeColors(R.color.twitter_blue
                 );
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
