@@ -1,4 +1,6 @@
-package com.codepath.apps.restclienttemplate.models;
+package com.codepath.apps.Twitterclient.models;
+
+import com.codepath.apps.Twitterclient.TimeFormatter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,5 +29,9 @@ public class Tweet {
             tweets.add(fromJson(jsonArray.getJSONObject(i)));
         }
         return tweets;
+    }
+
+    public String getCreatedAt() {
+        return TimeFormatter.getTimeDifference(createdAt);
     }
 }

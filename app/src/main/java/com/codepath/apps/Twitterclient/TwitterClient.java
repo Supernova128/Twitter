@@ -1,11 +1,10 @@
-package com.codepath.apps.restclienttemplate;
+package com.codepath.apps.Twitterclient;
 
 import android.content.Context;
 
 import com.codepath.asynchttpclient.RequestParams;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.oauth.OAuthBaseClient;
-import com.github.scribejava.apis.FlickrApi;
 import com.github.scribejava.apis.TwitterApi;
 import com.github.scribejava.core.builder.api.BaseApi;
 
