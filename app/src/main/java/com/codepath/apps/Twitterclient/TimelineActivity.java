@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -27,7 +28,9 @@ public class TimelineActivity extends AppCompatActivity {
     List<Tweet> tweets;
     TweetsAdapter adapter;
     SwipeRefreshLayout swipeContainer;
+    EndlessRecyclerViewScrollListener scrollListener;
 
+    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +39,12 @@ public class TimelineActivity extends AppCompatActivity {
         client = TwitterApplication.getRestClient(this);
 
         swipeContainer = findViewById(R.id.swipeContainer);
+
+        swipeContainer.setColorSchemeColors(android.R.color.holo_blue_bright,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_purple
+                );
+
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -48,9 +57,18 @@ public class TimelineActivity extends AppCompatActivity {
 
         tweets = new ArrayList<>();
         adapter = new TweetsAdapter(this,tweets);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
-        rvTweets.setLayoutManager(new LinearLayoutManager(this));
+        rvTweets.setLayoutManager(layoutManager);
         rvTweets.setAdapter(adapter);
+        scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Log.i(TAG,"onloadMore" + page);
+                loadMoreData();
+            }
+        };
+        rvTweets.addOnScrollListener(scrollListener);
         populateHomeTimeline();
     }
 
@@ -77,5 +95,26 @@ public class TimelineActivity extends AppCompatActivity {
         });{
 
         }
+    }
+    public void loadMoreData() {
+        // 1. Send an API request to retrieve appropriate paginated data
+        client.getNextPage(new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                JSONArray jsonArray = json.jsonArray;
+                try {
+                    List<Tweet> tweets = Tweet.fromJSONArray(jsonArray);
+                    adapter.addAll(tweets);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG,"Failed loadMorData", throwable);
+            }
+        }, tweets.get(tweets.size() - 1).id);
     }
 }
